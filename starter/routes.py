@@ -7,31 +7,12 @@ from starter.form import RegistrationForm, LoginForm, UpdadteAccountForm, PostFo
 from starter.models import User, Post
 from flask_login import login_user, current_user, logout_user, login_required
 
-posts = [
-    {
-        "author": "Jane Doe",
-        "title": "The Art of Coding",
-        "content": "Coding is both a science and an art. It requires creativity and logical thinking to build efficient solutions.",
-        "date_posted": "2024-08-01"
-    },
-    {
-        "author": "John Smith",
-        "title": "Exploring Machine Learning",
-        "content": "Machine learning is transforming industries with its ability to learn from data. Understanding its fundamentals is crucial for leveraging its full potential.",
-        "date_posted": "2024-08-02"
-    },
-    {
-        "author": "Alice Johnson",
-        "title": "Adventures in Web Development",
-        "content": "Web development continues to evolve with new technologies and frameworks. Staying updated with the latest trends is key to building modern web applications.",
-        "date_posted": "2024-08-03"
-    }
-]
 
 
 @app.route('/')
 @app.route('/home')
 def home():
+    posts = Post.query.all()
     return render_template('home.html', posts=posts)
 
 
@@ -110,11 +91,14 @@ def account():
                            title='Account', 
                            image_file=image_file,
                            form=form)
-@app.route("/post/new")
+@app.route("/post/new", methods=['GET', 'POST'])
 @login_required
 def new_post():
     form = PostForm()
     if form.validate_on_submit():
         flash("You just created a post!!", 'success')
+        post = Post(title=form.title.data, content=form.content.data, author=current_user)
+        db.session.add(post)
+        db.session.commit()
         return redirect(url_for('home'))
-    return render_template('create_post.html', title='New Post')
+    return render_template('create_post.html', title='New Post', form=form)
