@@ -19,6 +19,16 @@ class User(db.Model, UserMixin):
     # Was implemented with TimedJSONWebSignatureSirailizer
     def get_reset_token(self, expires_sec=1800):
         token = jwt.encode({'user_id': self.id, 'exp': int(time.time()) + expires_sec}, app.config['SECRET_KEY'], algorithm='HS256')
+        return token
+    
+    @staticmethod
+    def verify_reset_token(token):
+        try:
+            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+            user_id = data['user_id']
+        except:
+            return None
+        return User.query.get(user_id)
     def __repr__(self):
         return f"User('{self.username}', '{self.email}', '{self.image_file}')"
 
