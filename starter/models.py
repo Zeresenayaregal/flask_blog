@@ -1,5 +1,6 @@
 from datetime import datetime
-from itsdangerous import TimeJSONWebSignatureSerializer as Serializer
+import jwt
+import time
 from starter import db, login_manager, app
 from flask_login import UserMixin
 
@@ -15,9 +16,9 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(60), nullable=False)
     posts = db.relationship('Post', backref='author', lazy=True)
 
-    def get_reset_token(self, expiration_time=1800):
-        pass
-    
+    # Was implemented with TimedJSONWebSignatureSirailizer
+    def get_reset_token(self, expires_sec=1800):
+        token = jwt.encode({'user_id': self.id, 'exp': int(time.time()) + expires_sec}, app.config['SECRET_KEY'], algorithm='HS256')
     def __repr__(self):
         return f"User('{self.username}', '{self.email}', '{self.image_file}')"
 
