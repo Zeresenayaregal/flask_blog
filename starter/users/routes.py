@@ -2,7 +2,7 @@ from flask import render_template, url_for, flash, redirect, request, Blueprint
 from flask_login import login_user, current_user, logout_user, login_required
 from starter import db, bcrypt
 from starter.models import User, Post
-from starter.users.forms import (RegistrationForm, LoginForm, UpdateAccountForm,
+from starter.users.forms import (RegistrationForm, LoginForm, UpdadteAccountForm,
                                    RequestResetForm, ResetPasswordForm)
 from starter.users.utils import save_picture, send_reset_email
 
