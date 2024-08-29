@@ -1,7 +1,8 @@
 from datetime import datetime
 import jwt
 import time
-from starter import db, login_manager, app
+from flask import current_app
+from starter import db, login_manager
 from flask_login import UserMixin
 
 @login_manager.user_loader
@@ -18,13 +19,13 @@ class User(db.Model, UserMixin):
 
     # Was implemented with TimedJSONWebSignatureSirailizer
     def get_reset_token(self, expires_sec=1800):
-        token = jwt.encode({'user_id': self.id, 'exp': int(time.time()) + expires_sec}, app.config['SECRET_KEY'], algorithm='HS256')
+        token = jwt.encode({'user_id': self.id, 'exp': int(time.time()) + expires_sec}, current_app.config['SECRET_KEY'], algorithm='HS256')
         return token
     
     @staticmethod
     def verify_reset_token(token):
         try:
-            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+            data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
             user_id = data['user_id']
         except:
             return None
